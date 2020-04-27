@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戴夫加密通讯 戴夫编码</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: "Microsoft YaHei", "Heiti SC", tahoma, arial, "Hiragino Sans GB", 宋体, sans-serif;
+            ;
+        }
+
+        h1 {
+            font-size: 3vh;
+        }
+
+        textarea {
+            width: 90vw;
+            height: 40vh;
+            resize: none;
+            font-size: 3vh;
+        }
+
+        .button-swrapper {
+            display: flex;
+            margin: 1vw 0;
+        }
+
+        button {
+            user-select: none;
+            font-size: 2vh;
+        }
+
+        .space {
+            width: 1vw;
+        }
+    </style>
+    <script>
+        var encode_table = {
+            8: "歪",
+            4: "比",
+            2: "巴",
+            1: "卜",
+        }
+        var decode_table = {
+            "歪": 8,
+            "比": 4,
+            "巴": 2,
+            "卜": 1,
+        }
+        var forl = [8, 4, 2, 1]
+
+        function encodeUtf8(text) {
+            const code = encodeURIComponent(text);
+            const bytes = [];
+            for (var i = 0; i < code.length; i++) {
+                const c = code.charAt(i);
+                if (c === '%') {
+                    const hex = code.charAt(i + 1) + code.charAt(i + 2);
+                    const hexVal = parseInt(hex, 16);
+                    bytes.push(hexVal);
+                    i += 2;
+                } else bytes.push(c.charCodeAt(0));
+            }
+            return bytes;
+        }
+
+        function decodeUtf8(bytes) {
+            var encoded = "";
+            for (var i = 0; i < bytes.length; i++) {
+                encoded += '%' + bytes[i].toString(16);
+            }
+            return decodeURIComponent(encoded);
+        }
+
+        function hex2daifu(hexcode) {
+            temp = "";
+            for (var i in forl) {
+                if (hexcode & forl[i]) {
+                    temp += encode_table[forl[i]];
+                    hexcode ^= forl[i];
+                }
+            }
+            return temp;
+        }
+
+        window.onload = function() {
+            var encode_btn = document.getElementById("encode_btn");
+            var decode_btn = document.getElementById("decode_btn");
+            var input_textarea = document.getElementById("input");
+            var output_textarea = document.getElementById("output");
+            encode_btn.onclick = function() {
+                var plain_text = input_textarea.value;
+                var hex_list = encodeUtf8(plain_text);
+                var code_list = ['歪比歪比'];
+                for (var i in hex_list) {
+                    var onehex = parseInt(hex_list[i] / 16);
+                    code_list.push(hex2daifu(onehex));
+                    onehex = hex_list[i] % 16;
+                    code_list.push(hex2daifu(onehex));
+                }
+                code_list.push('歪比巴卜');
+                output_textarea.value = code_list.join(' ');
+            }
+            decode_btn.onclick = function() {
+                var cipher_text = input_textarea.value;
+                var code_list = cipher_text.split(" ");
+                if (!(code_list.length >= 2 && code_list.shift() === "歪比歪比" && code_list.pop() === "歪比巴卜")) {
+                    output_textarea.value = "解码失败";
+                    return;
+                }
+                var hex_list = [];
+                for (var codei = 0; codei < code_list.length; codei += 2) {
+                    var temp = 0;
+                    for (i in code_list[codei]) {
+                        temp += decode_table[code_list[codei][i]];
+                    }
+                    temp *= 16;
+                    for (i in code_list[codei + 1]) {
+                        temp += decode_table[code_list[codei + 1][i]];
+                    }
+                    hex_list.push(temp);
+                }
+                output_textarea.value = decodeUtf8(hex_list);
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>=== 戴夫编码 ===</h1>
+    <textarea id="input"></textarea>
+    <div class="button-swrapper">
+        <button id="encode_btn">戴夫编码</button>
+        <div class="space"></div>
+        <button id="decode_btn">戴夫解码</button>
+    </div>
+    <textarea id="output"></textarea>
+</body>
+
+</html>
