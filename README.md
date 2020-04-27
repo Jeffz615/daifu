@@ -21,6 +21,6 @@ daifu_decode("需要解密的密文")  # 返回明文
 
 [https://cloud.jeffz.cn/daifu.html](https://cloud.jeffz.cn/daifu.html)
 
-![image-20200427164334833](README.assets\image-20200427164334833.png)
+![image-20200427164334833](README.assets/image-20200427164334833.png)
 
-![image-20200427164354424.png](README.assets\image-20200427164354424.png)
+![image-20200427164354424.png](README.assets/image-20200427164354424.png)
