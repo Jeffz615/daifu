@@ -11,32 +11,42 @@
             flex-direction: column;
             align-items: center;
             font-family: "Microsoft YaHei", "Heiti SC", tahoma, arial, "Hiragino Sans GB", 宋体, sans-serif;
-            ;
         }
 
         h1 {
-            font-size: 3vh;
+            font-size: 20px;
+            margin: 1vh, 0;
         }
 
         textarea {
             width: 90vw;
-            height: 40vh;
+            height: 35vh;
             resize: none;
-            font-size: 3vh;
+            font-size: 15px;
         }
 
         .button-swrapper {
             display: flex;
-            margin: 1vw 0;
+            margin: 1vh 0;
         }
 
         button {
             user-select: none;
-            font-size: 2vh;
+            font-size: 15px;
         }
 
         .space {
             width: 1vw;
+        }
+
+        footer {
+            margin: 1vh 0;
+            font-size: 15px;
+        }
+
+        a {
+            color: #333;
+            text-decoration: none;
         }
     </style>
     <script>
@@ -77,10 +87,9 @@
         }
 
         window.onload = function() {
-            var encode_btn = document.getElementById("encode_btn");
-            var decode_btn = document.getElementById("decode_btn");
             var input_textarea = document.getElementById("input");
             var output_textarea = document.getElementById("output");
+            var encode_btn = document.getElementById("encode_btn");
             encode_btn.onclick = function() {
                 var plain_text = input_textarea.value;
                 var plain = encodeUtf8(plain_text);
@@ -98,6 +107,7 @@
                 }
                 output_textarea.value = cipher;
             }
+            var decode_btn = document.getElementById("decode_btn");
             decode_btn.onclick = function() {
                 var cipher_text = input_textarea.value;
                 if (cipher_text.length % 4) {
@@ -114,19 +124,39 @@
                 }
                 output_textarea.value = decodeUtf8(plain_hex_list);
             }
+            var clear_btn = document.getElementById("clear_btn");
+            clear_btn.onclick = function() {
+                input_textarea.value = '';
+            }
+            var copy_btn = document.getElementById("copy_btn");
+            copy_btn.onclick = function() {
+                try {
+                    output_textarea.select();
+                    document.execCommand("copy");
+                } catch (error) {
+                    alert("复制失败。");
+                    return
+                }
+                alert("复制成功!");
+            }
         }
     </script>
 </head>
 
 <body>
     <h1>=== 戴夫编码 ===</h1>
-    <textarea id="input"></textarea>
+    <textarea id="input" autofocus></textarea>
     <div class="button-swrapper">
+        <button id="clear_btn">清空输入</button>
+        <div class="space"></div>
         <button id="encode_btn">戴夫编码</button>
         <div class="space"></div>
         <button id="decode_btn">戴夫解码</button>
+        <div class="space"></div>
+        <button id="copy_btn">复制结果</button>
     </div>
     <textarea id="output"></textarea>
+    <footer>GIT from <a href="https://github.com/jeffz615/daifu" target="_blank">GITHUB</a> or <a href="https://gitee.com/jeffz615/daifu" target="_blank">GITEE</a></footer>
 </body>
 
 </html>
