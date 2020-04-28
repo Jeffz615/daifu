@@ -41,18 +41,17 @@
     </style>
     <script>
         var encode_table = {
-            8: "歪",
-            4: "比",
+            0: "歪",
+            1: "比",
             2: "巴",
-            1: "卜",
+            3: "卜",
         }
         var decode_table = {
-            "歪": 8,
-            "比": 4,
+            "歪": 0,
+            "比": 1,
             "巴": 2,
-            "卜": 1,
+            "卜": 3,
         }
-        var forl = [8, 4, 2, 1]
 
         function encodeUtf8(text) {
             const code = encodeURIComponent(text);
@@ -77,17 +76,6 @@
             return decodeURIComponent(encoded);
         }
 
-        function hex2daifu(hexcode) {
-            temp = "";
-            for (var i in forl) {
-                if (hexcode & forl[i]) {
-                    temp += encode_table[forl[i]];
-                    hexcode ^= forl[i];
-                }
-            }
-            return temp;
-        }
-
         window.onload = function() {
             var encode_btn = document.getElementById("encode_btn");
             var decode_btn = document.getElementById("decode_btn");
@@ -95,37 +83,36 @@
             var output_textarea = document.getElementById("output");
             encode_btn.onclick = function() {
                 var plain_text = input_textarea.value;
-                var hex_list = encodeUtf8(plain_text);
-                var code_list = ['歪比歪比'];
-                for (var i in hex_list) {
-                    var onehex = parseInt(hex_list[i] / 16);
-                    code_list.push(hex2daifu(onehex));
-                    onehex = hex_list[i] % 16;
-                    code_list.push(hex2daifu(onehex));
+                var plain = encodeUtf8(plain_text);
+                var cipher = ''
+                for (var i in plain) {
+                    var twohex = plain[i];
+                    halfhex = twohex >> 6;
+                    cipher += encode_table[halfhex];
+                    halfhex = twohex >> 4 & 3;
+                    cipher += encode_table[halfhex];
+                    halfhex = twohex >> 2 & 3;
+                    cipher += encode_table[halfhex];
+                    halfhex = twohex & 3;
+                    cipher += encode_table[halfhex];
                 }
-                code_list.push('歪比巴卜');
-                output_textarea.value = code_list.join(' ');
+                output_textarea.value = cipher;
             }
             decode_btn.onclick = function() {
                 var cipher_text = input_textarea.value;
-                var code_list = cipher_text.split(" ");
-                if (!(code_list.length >= 2 && code_list.shift() === "歪比歪比" && code_list.pop() === "歪比巴卜")) {
-                    output_textarea.value = "解码失败";
-                    return;
+                if (cipher_text.length % 4) {
+                    output_textarea.value = "Wrong cipher!";
                 }
-                var hex_list = [];
-                for (var codei = 0; codei < code_list.length; codei += 2) {
+                var plain_hex_list = [];
+                for (var i = 0; i < parseInt(cipher_text.length / 4); i++) {
                     var temp = 0;
-                    for (i in code_list[codei]) {
-                        temp += decode_table[code_list[codei][i]];
+                    for (var j = 0; j < 4; j++) {
+                        temp <<= 2;
+                        temp += decode_table[cipher_text[i * 4 + j]];
                     }
-                    temp *= 16;
-                    for (i in code_list[codei + 1]) {
-                        temp += decode_table[code_list[codei + 1][i]];
-                    }
-                    hex_list.push(temp);
+                    plain_hex_list.push(temp)
                 }
-                output_textarea.value = decodeUtf8(hex_list);
+                output_textarea.value = decodeUtf8(plain_hex_list);
             }
         }
     </script>
