@@ -19,7 +19,7 @@ daifu_decode("需要解密的密文")  # 返回明文
 
 #### javascript使用样例
 
-[https://cloud.jeffz.cn/daifu.html](https://cloud.jeffz.cn/daifu.html)
+[https://cloud.jeffz.cn/websites/daifu/](https://cloud.jeffz.cn/websites/daifu/)
 
 ![image-20200427164334833](README.assets/image-20200427164334833.png)
 
